@@ -39,7 +39,7 @@ export const register = async (req: Request, res: Response) => {
     data: { name, email: email.toLowerCase(), password: hashPassword },
   });
 
-  const token = generateJWTToken(user.id, "15d");
+  const token = generateJWTToken({ id: user.id, role: "user" }, "15d");
 
   const userData: any = { ...user };
   delete userData.password;
@@ -71,7 +71,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(401).json({ message: "Invalid email or password" });
   }
 
-  const token = generateJWTToken(user.id, "15d");
+const token = generateJWTToken({ id: user.id, role: "user" }, "15d");
 
   const userData: any = { ...user };
   delete userData.password;

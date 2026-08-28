@@ -8,6 +8,9 @@ import authRouter from "./routes/auth.route.js";
 import productRouter from "./routes/product.route.js";
 import uploadRouter from "./routes/upload.route.js";
 import orderRouter from "./routes/order.route.js";
+import addressRouter from "./routes/address.route.js";
+import adminRouter from "./routes/admin.route.js";
+import deliveryPartnerRouter from "./routes/deliveryPartner.route.js";
 
 const app = express();
 
@@ -32,6 +35,9 @@ app.use("/api/upload", uploadRouter);
 app.use("/api/orders", orderRouter);
 // Set up the "/api/inngest" (recommended) routes with the serve handler
 app.use("/api/inngest", serve({ client: inngest, functions }));
+app.use("/api/addresses", addressRouter);
+app.use("/api/admin", adminRouter);
+app.use('/api/delivery', deliveryPartnerRouter)
 
 // ── Error handling(server) ─────────────────────
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
@@ -41,7 +47,6 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-
 // ✅ Only listen locally, Vercel handles this in production
 if (process.env.NODE_ENV !== "production") {
   app.listen(port, () => {
@@ -49,4 +54,4 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
- export default app; // ✅ Vercel needs this
+export default app; // ✅ Vercel needs this
