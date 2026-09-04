@@ -15,31 +15,35 @@ import {
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/authContext";
 
 const Navbar = () => {
-  const user: any = {
-    name: "John Doe",
-    email: "john@example.com",
-    isAdmin: true,
-  };
+  const { user, logout } = useAuth();
   const { cartCount, setIsCartOpen } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleSearch = (e:React.SubmitEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()){
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
-      setSearchQuery("")
-    }
-  }
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
+  const handleSearch = (e: React.SubmitEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
+  };
 
   const handleLogout = () => {
+    logout();
     setUserMenuOpen(false);
-    navigate('/')
-  }
+    navigate("/");
+  };
 
   return (
     <nav className="bg-white sticky top-0 z-50 border-b border-app-border">
@@ -53,12 +57,21 @@ const Navbar = () => {
         <div className="w-full flex items-center justify-end gap-4 lg:gap-10">
           {/* Nav Links - Desktop */}
           <div className="hidden md:flex items-center gap-6 text-sm text-zinc-600">
-            <Link to="/">Home</Link>
-            <Link to="/products">Products</Link>
-            <Link to="/deals">Deals</Link>
+            <Link to="/" onClick={scrollToTop}>
+              Home
+            </Link>
+            <Link to="/products" onClick={scrollToTop}>
+              Products
+            </Link>
+            <Link to="/deals" onClick={scrollToTop}>
+              Deals
+            </Link>
           </div>
           {/* Search */}
-          <form onSubmit={handleSearch} className="hidden sm:flex flex-1 max-w-sm text-xs sm:text-sm">
+          <form
+            onSubmit={handleSearch}
+            className="hidden sm:flex flex-1 max-w-sm text-xs sm:text-sm"
+          >
             <div className="relative w-full">
               <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-zinc-500" />
               <input
@@ -144,7 +157,10 @@ const Navbar = () => {
                       )}
 
                       {user && (
-                        <Link to="/orders" className="dropdown-link hover:bg-amber-50/80">
+                        <Link
+                          to="/orders"
+                          className="dropdown-link hover:bg-amber-50/80"
+                        >
                           {" "}
                           <PackageIcon size={16} /> My Orders
                         </Link>
@@ -179,7 +195,8 @@ const Navbar = () => {
 
                       {user && (
                         <div className="border-t border-app-border pt-1">
-                          <button onClick={handleLogout}
+                          <button
+                            onClick={handleLogout}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-app-error hover:bg-red-50 w-full transition-colors
                           "
                           >

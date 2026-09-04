@@ -11,8 +11,11 @@ import orderRouter from "./routes/order.route.js";
 import addressRouter from "./routes/address.route.js";
 import adminRouter from "./routes/admin.route.js";
 import deliveryPartnerRouter from "./routes/deliveryPartner.route.js";
+import { stripeWebhook } from "./controllers/webhooks.controller.js";
 
 const app = express();
+
+app.post("/api/stripe", express.raw({ type: "application/json" }),stripeWebhook);
 
 // ── Middleware  ─────────────────────
 app.use(cors());
@@ -37,7 +40,7 @@ app.use("/api/orders", orderRouter);
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/addresses", addressRouter);
 app.use("/api/admin", adminRouter);
-app.use('/api/delivery', deliveryPartnerRouter)
+app.use("/api/delivery", deliveryPartnerRouter);
 
 // ── Error handling(server) ─────────────────────
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {

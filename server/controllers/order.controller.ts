@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import Stripe from "stripe";
 import { prisma } from "../config/db.js";
 import { inngest } from "../inngest/index.js";
 
@@ -71,6 +72,27 @@ export const createOrder = async (req: Request, res: Response) => {
 
   if (paymentMethod === "card") {
     //stripe payment link
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+
+    const session = await stripe.checkout.sessions.create({
+      success_url: `${req.headers.origin}/orders?clearCart=true`,
+      cancel_url: `${req.headers.origin}/checkout`,
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: "Payment Groceries",
+            },
+            unit_amount: Math.round(total * 100),
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      metadata: { orderId: order.id },
+    });
+    return res.json({ url: session.url });
   }
 
   // if payment method is 'cash'
@@ -86,13 +108,13 @@ export const createOrder = async (req: Request, res: Response) => {
 
   // send stock update events for each product in the order
   for (const item of orderItems) {
-    await inngest.send({name:"inventory/stock.updated", data:{productId: item.product}})
+    await inngest.send({
+      name: "inventory/stock.updated",
+      data: { productId: item.product },
+    });
   }
 
-  await inngest.send({name:"order/placed", data:{orderId: order.id}})
-
-
-
+  await inngest.send({ name: "order/placed", data: { orderId: order.id } });
 };
 
 // GET: /api/orders (get user's orders(all))
@@ -170,20 +192,21 @@ export const getAllOrders = async (req: Request, res: Response) => {
       user: { select: { name: true, email: true } },
       deliveryPartner: { select: { name: true, phone: true, email: true } },
     },
-    orderBy:{createdAt:'desc'}
+    orderBy: { createdAt: "desc" },
   });
-  res.json({orders})
+  res.json({ orders });
 };
 
 // GET: /api/orders/:id/location (Get Order Location)
-export const getOrderLocation = async (req: Request, res: Response) => { 
+export const getOrderLocation = async (req: Request, res: Response) => {
   const order = await prisma.order.findFirst({
-    where:{id: req.params.id as string, userId: req.user?.id},select:{liveLocation:true,status:true}
-  })
+    where: { id: req.params.id as string, userId: req.user?.id },
+    select: { liveLocation: true, status: true },
+  });
 
-   if (!order) {
-     return res.status(404).json({ message: "Order not found" });
+  if (!order) {
+    return res.status(404).json({ message: "Order not found" });
   }
-  
-  res.json({liveLocation: order.liveLocation, status: order.status})
-}
+
+  res.json({ liveLocation: order.liveLocation, status: order.status });
+};

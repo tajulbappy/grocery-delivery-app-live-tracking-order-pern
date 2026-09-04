@@ -98,11 +98,11 @@ const AddressForm = ({
                   ZIP Code
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   required
                   className="w-full px-4 py-2.5 text-sm rounded-xl border border-app-border focus:border-app-green outline-none"
                   value={form.zip}
-                  onChange={(e) => setForm({ ...form, sip: e.target.value })}
+                  onChange={(e) => setForm({ ...form, zip: e.target.value })}
                 />
               </div>
               

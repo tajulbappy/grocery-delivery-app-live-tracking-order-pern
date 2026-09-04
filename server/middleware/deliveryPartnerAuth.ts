@@ -32,6 +32,8 @@ const deliveryPartnerAuth = async (
       return res.status(403).json({ message: "Account is deactivated" });
     }
     req.partner = partner;
+
+    next();
   } catch (error) {
     console.log(error);
     return res.status(401).json({ message: "Token is not valid" });

@@ -3,6 +3,15 @@ import { Link } from "react-router-dom";
 import { footerData } from "../assets/assets";
 
 const Footer = () => {
+   const scrollToTop = () => {
+     window.scrollTo({
+       top: 0,
+       behavior: "smooth",
+     });
+   };
+
+
+
   return (
     <section className="bg-app-green text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -34,23 +43,30 @@ const Footer = () => {
           {/* Dynamic Section */}
           {footerData.sections.map((section, index) => (
             <div key={index}>
-              <h3 className="text-sm font-semibold uppercase mb-4">{section.title}</h3>
+              <h3 className="text-sm font-semibold uppercase mb-4">
+                {section.title}
+              </h3>
               <ul className="space-y-2.5">
                 {section.links.map((link, index) => (
                   <li key={index}>
                     {link.to ? (
-                      <Link to={link.to} className="text-sm text-white/70 hover:text-white">
+                      <Link
+                        onClick={scrollToTop}
+                        to={link.to}
+                        className="text-sm text-white/70 hover:text-white"
+                      >
                         {link.label}
-
                       </Link>
                     ) : (
-                        <a href={link.href} className="text-sm text-white/70 hover:text-white">
-                          {link.label}
-                        </a>
+                      <a
+                        href={link.href}
+                        className="text-sm text-white/70 hover:text-white"
+                      >
+                        {link.label}
+                      </a>
                     )}
                   </li>
-                )
-                )}
+                ))}
               </ul>
             </div>
           ))}
@@ -67,23 +83,24 @@ const Footer = () => {
                     {item.text}
                   </li>
                 );
-              
               })}
             </ul>
           </div>
-
-
-
         </div>
         {/* Bottom */}
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-xs text-white/50">{footerData.bottom.copyright}</p>
           <div className="flex gap-4">
             {footerData.bottom.links.map((link, index) => (
-              <a key={index} href={link.href} className="text-xs text-white50 hover:text-white/70">{link.label}</a>
+              <a
+                key={index}
+                href={link.href}
+                className="text-xs text-white50 hover:text-white/70"
+              >
+                {link.label}
+              </a>
             ))}
           </div>
-
         </div>
       </div>
     </section>

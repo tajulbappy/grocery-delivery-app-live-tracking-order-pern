@@ -18,7 +18,7 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
 
     req.user = { id: decoded.id };
     next();
-  } catch (error:any) {
+  } catch (error) {
     console.log(error);
     return res.status(401).json({ message: "Token is not valid" });
   }

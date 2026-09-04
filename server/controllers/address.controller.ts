@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { prisma } from "../config/db.js";
-import { err } from "inngest/types";
 
 // GET: /api/addresses (get user addresses)
 export const getUserAddresses = async (req: Request, res: Response) => {

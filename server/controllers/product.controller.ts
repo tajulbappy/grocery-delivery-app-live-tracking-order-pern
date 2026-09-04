@@ -55,13 +55,14 @@ export const getProducts = async (req: Request, res: Response) => {
 };
 
 // GET(get single product): /api/products/:id
+
 export const getProduct = async (req: Request, res: Response) => {
   const product = await prisma.product.findUnique({
     where: { id: req.params.id as string },
   });
 
   if (!product) {
-    res.status(404).json({ message: " Product not found" });
+    res.status(404).json({ message: "Product not found" });
     return;
   }
 
@@ -73,28 +74,104 @@ export const getProduct = async (req: Request, res: Response) => {
         )
       : 0;
 
-  res.json({ ...product, discount });
+  res.json({
+    product: {
+      ...product,
+      discount,
+    },
+  });
 };
 
 // POST(create a product): /api/products
 export const createProduct = async (req: Request, res: Response) => {
-  const product = await prisma.product.create({ data: req.body });
-  res.status(201).json({ product });
+  try {
+    const {
+      name,
+      description,
+      price,
+      originalPrice,
+      image,
+      category,
+      unit,
+      stock,
+      isOrganic,
+    } = req.body;
+
+    const product = await prisma.product.create({
+      data: {
+        name,
+        description,
+        price: Number(price),
+        originalPrice: Number(originalPrice),
+        image,
+        category,
+        unit,
+        stock: Number(stock),
+        isOrganic: isOrganic === true || isOrganic === "true",
+      },
+    });
+
+    res.status(201).json({ product });
+  } catch (error: any) {
+    console.error("Create product error:", error);
+
+    res.status(500).json({
+      message: error.message || "Failed to create product",
+    });
+  }
 };
 
 // PUT(update a product): /api/products/:id
 export const updateProduct = async (req: Request, res: Response) => {
-  const product = await prisma.product.update({
-    where: { id: req.params.id as string },
-    data: req.body,
-  });
-  res.json({ product });
+  try {
+    const product = await prisma.product.update({
+      where: {
+        id: req.params.id as string,
+      },
+      data: {
+        name: req.body.name,
+        description: req.body.description,
+        price: Number(req.body.price),
+        originalPrice: Number(req.body.originalPrice),
+        image: req.body.image,
+        category: req.body.category,
+        unit: req.body.unit,
+        stock: Number(req.body.stock),
+        isOrganic: Boolean(req.body.isOrganic),
+      },
+    });
+
+    res.json({ product });
+  } catch (error: any) {
+    console.error("Update product error:", error);
+
+    res.status(500).json({
+      message: error.message || "Failed to update product",
+    });
+  }
 };
 
-// DELETE(delete a product): /api/products/:id
-export const deleteProduct = async (req: Request, res: Response) => {
-  await prisma.product.delete({
-    where: { id: req.params.id as string },
-  });
-  res.json({ message: "Product Deleted" });
+// UPDATE(Update product STOCK): /api/products/:id/out-of-stock (when admin delete a product then that product will display as a out of stock")
+export const updateProductStock = async (req: Request, res: Response) => {
+  try {
+    const product = await prisma.product.update({
+      where: {
+        id: req.params.id as string,
+      },
+      data: {
+        stock: 0,
+      },
+    });
+
+    res.json({
+      message: "Product marked as out of stock",
+      product,
+    });
+  } catch (error: any) {
+    console.error("Update stock error:", error);
+
+    res.status(500).json({
+      message: error.message || "Failed to update product stock",
+    });
+  }
 };
