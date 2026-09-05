@@ -5,7 +5,7 @@ import { inngest } from "../inngest/index.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
-const endpointSecret = process.env.STRIPE_WEB_SECRET;
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export const stripeWebhook = async (request: Request, response: Response) => {
   // --------------------------------------------------
